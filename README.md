@@ -12,3 +12,4 @@
 
 - Adding an express server and a database to handle transactions
 - adding more validation to make sure inputs are what we expect
+- clean up code in `transactions.js` and separate out logic into helper files and logical modules

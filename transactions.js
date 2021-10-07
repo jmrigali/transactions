@@ -15,57 +15,75 @@ async function main(arguments) {
   .on('end', () => {
      
       const users = {}
+
       results.forEach((transaction) => {
+        // if client does not exist create new Client
         if (!users[transaction.client]) {
           users[transaction.client] = new Client()
         }
+
         const client = users[transaction.client]
 
-        switch (transaction.type) {
-          case 'deposit':
-            client.handleDeposit(transaction)
-
-            break
-          case 'withdrawal':
-            client.handleWithdrawal(transaction)
-
-            break
-          case 'dispute':
-            client.handleDispute(transaction)
-            break
-          case 'resolve':
-            client.handleResolution(transaction)
-            break
-          case 'chargeback':
-            client.handleChargebacks(transaction)
-            break
-          default:
-            break
-        }
+        // handle transactions
+        handleTransaction(client, transaction)
       })
-      const data = []
-      for (let user in users) {
-        const currentUser = users[user]
-        data.push({
-          client: user,
-          available: toPrecision(currentUser.available),
-          held: toPrecision(currentUser.held),
-          total: toPrecision(currentUser.available + currentUser.held),
-          locked: currentUser.locked
-        })
-      }
-      console.log(files)
+
+      // format data to be pushed to csv output
+      const data = formatDataForCSVOutput(users)
+     
+      // create csv output
       createFinalCSV(data, files[1])
     })
 }
 
+// helper method to make sure decimal units round to 4 decimal places
 function toPrecision(amount) {
   return parseFloat(amount.toFixed(4))
 }
 
+ // format data to be pushed to csv output
+function handleTransaction(client, transaction){
+  switch (transaction.type) {
+    case 'deposit':
+      client.handleDeposit(transaction)
+
+      break
+    case 'withdrawal':
+      client.handleWithdrawal(transaction)
+
+      break
+    case 'dispute':
+      client.handleDispute(transaction)
+      break
+    case 'resolve':
+      client.handleResolution(transaction)
+      break
+    case 'chargeback':
+      client.handleChargebacks(transaction)
+      break
+    default:
+      break
+  }
+}
+
+function formatDataForCSVOutput(users){
+  const data = []
+  for (let user in users) {
+    const currentUser = users[user]
+    data.push({
+      client: user,
+      available: toPrecision(currentUser.available),
+      held: toPrecision(currentUser.held),
+      total: toPrecision(currentUser.available + currentUser.held),
+      locked: currentUser.locked
+    })
+  }
+  return data
+}
+
 //using npm package to write data to a csv file
 function createFinalCSV(data, file) {
-  console.log(process.argv[2])
+  
   const outputFile = file ? file : 'accounts.csv'
   const csvWriter = createCsvWriter({
     path: `./results/${outputFile}`,
