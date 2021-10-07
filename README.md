@@ -4,7 +4,9 @@
 
 ## To Test:
 
-- update file in `assets/transactions.csv`
+- clone repo from github: `git clone https://github.com/jmrigali/transactions.git`
+- run `npm install`
+- update file in `assets/transactions.csv` with transaction data
 - run command `node transactions.js transactions.csv > accounts.csv`
 - validate output in `accounts.csv` file
 
